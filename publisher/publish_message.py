@@ -54,15 +54,3 @@ def publish_new_message(broker_url, queue, title, data_id, app_type):
     connection.close()
 
     return successful
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog="Message Processor")
-    parser.add_argument("-url", "--URL", dest="broker_url", help="URL to Rabbitmq borker", required=True)
-    parser.add_argument("-q", "--QUEUE", dest="queue", help="Queue to publish message to", required=True)
-    parser.add_argument("-t", "--TITLE", dest="title", help="Message Title", required=True)
-    parser.add_argument("-data_id", "--DATA_ID", dest="data_id", help="Data ID", required=True)
-    parser.add_argument("-app_type", "--APP_TYPE", dest="app_type", help="App Type Integer", required=True)
-
-    args = parser.parse_args()
-
-    publish_new_message(args.broker_url, args.queue, args.title, args.data_id, args.app_type)

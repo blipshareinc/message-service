@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-from process import publish_new_message
+from publish_message import publish_new_message
 
 app = Flask("Message Service")
 
