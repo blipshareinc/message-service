@@ -8,6 +8,7 @@ import json
 logging.basicConfig(level=logging.DEBUG)
 
 def publish_new_message(broker_url, queue, title, data_id, app_type):
+    logging.info("Sending message to queue: %s" % broker_url)
     successful = False
 
     data = {
@@ -19,7 +20,7 @@ def publish_new_message(broker_url, queue, title, data_id, app_type):
     credentials = pika.PlainCredentials('user', 'password')
 
     # Connect to RabbitMQ using the default parameters
-    parameters = pika.ConnectionParameters(broker_url, credentials=credentials)
+    parameters = pika.ConnectionParameters(host=broker_url, credentials=credentials)
     connection = pika.BlockingConnection(parameters)
 
     # Create a channel

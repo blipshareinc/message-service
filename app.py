@@ -27,5 +27,8 @@ def announce():
                 json['title'],
                 json['data-id'],
                 json['app-type']):
-                return jsonify({"Message successfully sent."})
-            return jsonify({"Message was now sent."})
+                return jsonify({"status_code": 200, "message": "Message successfully sent."})
+            return jsonify({"status_code": 500, "message": "Message was now sent."})
+    
+#if __name__ == '__main__':
+#    app.run(host="0.0.0.0", port="11004", debug=True)

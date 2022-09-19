@@ -1,0 +1,6 @@
+{
+    "name": "Message Service Dev Container",
+    "context": "..",
+    "dockerFile": "./Dockerfile",
+    "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ]
+}
