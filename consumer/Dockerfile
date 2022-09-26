@@ -6,16 +6,19 @@ ARG uid=1001
 ARG gid=1001
 
 RUN apk update && \
-    apk add vlc alsa-utils alsa-utils-doc alsa-lib alsaconf alsa-ucm-conf
+    apk add sudo vlc alsa-utils alsa-utils-doc alsa-lib && \
+    apk add alsaconf alsa-ucm-conf dbus pulseaudio pulseaudio-alsa
 
 RUN addgroup -g ${gid} ${group} && \
-    adduser --disabled-password --gecos "" --uid ${uid} --ingroup ${group} $user
+    adduser -h /home/$user --disabled-password --gecos "" --uid ${uid} --ingroup ${group} $user && \
+    adduser $user wheel && \
+    echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
 
 COPY . /app
 
-RUN chown appuser /app
+RUN chown $user /app
 
-USER appuser
+USER $user
 
 WORKDIR /app
 
@@ -25,6 +28,7 @@ RUN python3 -m venv env && \
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 ENV PATH=/app/env/bin:$PATH
+ENV DISPLAY=:0
 
 EXPOSE $PORT
 

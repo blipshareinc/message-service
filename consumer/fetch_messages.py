@@ -21,28 +21,40 @@ def _run_shell_command(cmd):
 
     if stderr:
         logging.error("Error running cmd: %s" % "".join(cmd))
+        logging.error(stderr)
     if stdout:
         logging.debug("Ran command: %s" % "".join(cmd))
 
 def _fetch_data_from_db(db_url, data_id):
-    url = '%s/tts/get_tts' % db_url
-    headers = {'Content-Type': 'application/json'}
-    params = {'id': data_id}
-    req = requests.get(url, headers=headers, params=params)
-    json = req.json()     
-    logging.info('Response for data_id: %s => %s' % (data_id, json))
+    url = '%s/tts/get_tts/%s' % (db_url, data_id)
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+        }
+    req = requests.get(url, headers=headers)
+    logging.debug("TTS: getting data from database using url: %s and data_id: %s" % (url, data_id))
+    json = req.json()
+    logging.debug('TTS: Response for data_id: %s => %s' % (data_id, json))
 
     if json:
         audio_file_path = json['audio_file_name']
         if audio_file_path:
             audio_file_path = path.join('/app/output', audio_file_path)
 
-            # announce the data received
-            cmd = ['vlc -I dummy %s vlc://quit' % audio_file_path]
+            ## first announce that there is a new announcement
+            audio_path = path.join('/app/output', 'new_announcement.wav')
+            cmd = ['vlc -I dummy %s vlc://quit' % audio_path]
             _run_shell_command(cmd)
-            # sleep for few seconds in case there are more than one announcement
-            # this allows to create a gap between announcements
-            sleep(3)
+    
+            # announce the data received, play it twice for the user to hear it properly
+            count = 0
+            while count < 2:
+                cmd = ['vlc -I dummy %s vlc://quit' % audio_file_path]
+                _run_shell_command(cmd)
+                # sleep for few seconds in case there are more than one announcement
+                # this allows to create a gap between announcements
+                sleep(3)
+                count+=1
 
 def start_message_listener(broker_url, db_url, queue):
     logging.info("Starting listener for host=%s and queue=: %s" % (broker_url, queue))
@@ -67,10 +79,11 @@ def start_message_listener(broker_url, db_url, queue):
         # start processing if data is available
         if body:
             body = json.loads(body)
-            logging.info(body)
+            logging.debug('TTS: %s' % body)
+
             if 'title' in body and \
                 'data_id' in body and \
-                'app_id' in body:
+                'app_type' in body:
                 # get and process from the database
                 _fetch_data_from_db(db_url, body['data_id'])
     channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
