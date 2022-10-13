@@ -7,4 +7,4 @@ app = Flask("Message Service")
 
 broker_url = environ["BROKER_URL"]
 db_url = "%s:%s" % (environ["DATABASE_URL"], environ["DATABASE_PORT"])
-start_message_listener(broker_url, database_url , "announcement")
+start_message_listener(broker_url, db_url , "announcement")
